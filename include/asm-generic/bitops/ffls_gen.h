@@ -11,12 +11,15 @@
  *          aimed to remove all magic numbers and bad smells of fls function series since
  *          original implementation in files: __fls.h, fls.h, fls64.h, bitops.h are
  *          almost the duplicates of each others.
+ *          Current implementation is suitable for input type within 64 bits.
  */
 
 #define __FFLS_START_INDEX_FROM_ZERO 0
 #define __FFLS_START_INDEX_FROM_ONE 1
 
-
+/**
+ * Hidden generator of ffs to hide evaluation of size of type
+ */
 #define __gen_ffs(in_type, out_type, start_from, fn_name, bit_len) \
     static __always_inline out_type fn_name(in_type x)             \
     {                                                              \
@@ -27,6 +30,9 @@
         bits = start_from;                                         \
         shift = bit_len >> 1;                                      \
         mask = (in_type) ~(0xFFFFFFFFFFFFFFFF << shift);           \
+        /* unroll 5 times for 64 bits input */                     \
+        /* no side effect if exceed possible unroll time */        \
+        _Pragma("GCC unroll 5")                                    \
         do {                                                       \
             if (!(x & mask)) {                                     \
                 bits += shift;                                     \
@@ -61,6 +67,9 @@
 #define gen_ffs(in_type, out_type, start_from, fn_name) \
     __gen_ffs(in_type, out_type, start_from, fn_name, (sizeof(in_type) * 8))
 
+/**
+ * Hidden generator of fls to hide evaluation of size of type
+ */
 #define __gen_fls(in_type, out_type, start_from, fn_name, bit_len) \
     static __always_inline out_type fn_name(in_type x)             \
     {                                                              \
@@ -71,6 +80,9 @@
         shift = bit_len >> 1;                                      \
         bits = bit_len - 1 + start_from;                           \
         mask = (in_type) (0xFFFFFFFFFFFFFFFF << shift);            \
+        /* unroll 5 times for 64 bits input */                     \
+        /* no side effect if exceed possible unroll time */        \
+        _Pragma("GCC unroll 5")                                    \
         do {                                                       \
             if (!(x & mask)) {                                     \
                 bits -= shift;                                     \
