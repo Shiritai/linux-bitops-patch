@@ -27,7 +27,7 @@
             return 0;                                              \
         bits = start_from;                                         \
         shift = bit_len >> 1;                                      \
-        mask = (in_type) ~(_ONES << (bit_len >> 1));               \
+        mask = (in_type) ~(_ONES << shift);                        \
         do {                                                       \
             if (!(x & mask)) {                                     \
                 bits += shift;                                     \

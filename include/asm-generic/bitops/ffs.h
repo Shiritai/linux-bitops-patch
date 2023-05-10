@@ -4,7 +4,7 @@
 
 #include <asm-generic/bitops/ffls_gen.h>
 
-#define __unsigned_long unsigned long
+#define __unsigned_int unsigned int
 /**
  * ffs - find first bit set
  * @x: the word to search
@@ -14,6 +14,6 @@
  * differs in spirit from ffz (man ffs).
  */
 gen_ffs(__unsigned_int, int, __FFLS_START_INDEX_FROM_ONE, ffs);
-#undef __unsigned_long
+#undef __unsigned_int
 
 #endif /* _ASM_GENERIC_BITOPS_FFS_H_ */

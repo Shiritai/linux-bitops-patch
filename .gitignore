@@ -174,3 +174,11 @@ sphinx_*/
 
 # Rust analyzer configuration
 /rust-project.json
+
+# user mode kernel related files (file system)
+/rootfs/**
+!/rootfs/init.sh
+
+# make-related files
+testMake
+*.log
