@@ -41,9 +41,7 @@ static inline __attribute__ ((const)) int clz(unsigned int x)
 	return res;
 }
 
-#define __unsigned_int unsigned int
-gen_fls(__unsigned_int, int, __FFLS_START_INDEX_FROM_ONE, constant_fls);
-#undef __unsigned_int
+gen_fls(unsigned int, int, __FFLS_START_INDEX_FROM_ONE, constant_fls);
 
 /*
  * fls = Find Last Set in word

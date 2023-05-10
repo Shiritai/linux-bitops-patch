@@ -16,7 +16,6 @@
 #define __FFLS_START_INDEX_FROM_ZERO 0
 #define __FFLS_START_INDEX_FROM_ONE 1
 
-#define _ONES 0xFFFFFFFFFFFFFFFF
 
 #define __gen_ffs(in_type, out_type, start_from, fn_name, bit_len) \
     static __always_inline out_type fn_name(in_type x)             \
@@ -27,7 +26,7 @@
             return 0;                                              \
         bits = start_from;                                         \
         shift = bit_len >> 1;                                      \
-        mask = (in_type) ~(_ONES << shift);                        \
+        mask = (in_type) ~(0xFFFFFFFFFFFFFFFF << shift);           \
         do {                                                       \
             if (!(x & mask)) {                                     \
                 bits += shift;                                     \
@@ -71,7 +70,7 @@
             return 0;                                              \
         shift = bit_len >> 1;                                      \
         bits = bit_len - 1 + start_from;                           \
-        mask = (in_type) (_ONES << shift);                         \
+        mask = (in_type) (0xFFFFFFFFFFFFFFFF << shift);            \
         do {                                                       \
             if (!(x & mask)) {                                     \
                 bits -= shift;                                     \
@@ -105,7 +104,5 @@
  */
 #define gen_fls(in_type, out_type, start_from, fn_name) \
     __gen_fls(in_type, out_type, start_from, fn_name, (sizeof(in_type) * 8))
-
-#undef _ONES
 
 #endif /* _ASM_GENERIC_BITOPS_SOFTWARE_FFS_FLS_GEN_H_ */
