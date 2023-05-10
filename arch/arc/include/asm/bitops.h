@@ -17,6 +17,8 @@
 
 #ifdef CONFIG_ISA_ARCOMPACT
 
+#include <asm-generic/bitops/ffls_gen.h>
+
 /*
  * Count the number of zeros, starting from MSB
  * Helper for fls( ) friends
@@ -39,32 +41,9 @@ static inline __attribute__ ((const)) int clz(unsigned int x)
 	return res;
 }
 
-static inline int constant_fls(unsigned int x)
-{
-	int r = 32;
-
-	if (!x)
-		return 0;
-	if (!(x & 0xffff0000u)) {
-		x <<= 16;
-		r -= 16;
-	}
-	if (!(x & 0xff000000u)) {
-		x <<= 8;
-		r -= 8;
-	}
-	if (!(x & 0xf0000000u)) {
-		x <<= 4;
-		r -= 4;
-	}
-	if (!(x & 0xc0000000u)) {
-		x <<= 2;
-		r -= 2;
-	}
-	if (!(x & 0x80000000u))
-		r -= 1;
-	return r;
-}
+#define __unsigned_int unsigned int
+gen_fls(__unsigned_int, int, __FFLS_START_INDEX_FROM_ONE, constant_fls);
+#undef __unsigned_int
 
 /*
  * fls = Find Last Set in word

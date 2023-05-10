@@ -4,6 +4,8 @@
 
 #include <asm/types.h>
 
+#include <asm-generic/bitops/ffls_gen.h>
+
 /**
  * fls64 - find last set bit in a 64-bit word
  * @x: the word to search
@@ -15,21 +17,8 @@
  * set bit if value is nonzero. The last (most significant) bit is
  * at position 64.
  */
-#if BITS_PER_LONG == 32
-static __always_inline int fls64(__u64 x)
-{
-	__u32 h = x >> 32;
-	if (h)
-		return fls(h) + 32;
-	return fls(x);
-}
-#elif BITS_PER_LONG == 64
-static __always_inline int fls64(__u64 x)
-{
-	if (x == 0)
-		return 0;
-	return __fls(x) + 1;
-}
+#ifdef BITS_PER_LONG
+gen_fls(__u64, int, __FFLS_START_INDEX_FROM_ONE, fls64);
 #else
 #error BITS_PER_LONG not 32 or 64
 #endif

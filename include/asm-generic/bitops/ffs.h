@@ -2,6 +2,9 @@
 #ifndef _ASM_GENERIC_BITOPS_FFS_H_
 #define _ASM_GENERIC_BITOPS_FFS_H_
 
+#include <asm-generic/bitops/ffls_gen.h>
+
+#define __unsigned_long unsigned long
 /**
  * ffs - find first bit set
  * @x: the word to search
@@ -10,33 +13,7 @@
  * the libc and compiler builtin ffs routines, therefore
  * differs in spirit from ffz (man ffs).
  */
-static inline int ffs(int x)
-{
-	int r = 1;
-
-	if (!x)
-		return 0;
-	if (!(x & 0xffff)) {
-		x >>= 16;
-		r += 16;
-	}
-	if (!(x & 0xff)) {
-		x >>= 8;
-		r += 8;
-	}
-	if (!(x & 0xf)) {
-		x >>= 4;
-		r += 4;
-	}
-	if (!(x & 3)) {
-		x >>= 2;
-		r += 2;
-	}
-	if (!(x & 1)) {
-		x >>= 1;
-		r += 1;
-	}
-	return r;
-}
+gen_ffs(__unsigned_int, int, __FFLS_START_INDEX_FROM_ONE, ffs);
+#undef __unsigned_long
 
 #endif /* _ASM_GENERIC_BITOPS_FFS_H_ */
