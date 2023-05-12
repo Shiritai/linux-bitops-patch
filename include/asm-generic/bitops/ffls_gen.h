@@ -32,7 +32,7 @@
         mask = (in_type) ~(0xFFFFFFFFFFFFFFFF << shift);           \
         /* unroll 5 times for 64 bits input */                     \
         /* no side effect if exceed possible unroll time */        \
-        _Pragma("GCC unroll 5")                                    \
+        _Pragma("GCC unroll 6")                                    \
         do {                                                       \
             if (!(x & mask)) {                                     \
                 bits += shift;                                     \
@@ -82,7 +82,7 @@
         mask = (in_type) (0xFFFFFFFFFFFFFFFF << shift);            \
         /* unroll 5 times for 64 bits input */                     \
         /* no side effect if exceed possible unroll time */        \
-        _Pragma("GCC unroll 5")                                    \
+        _Pragma("GCC unroll 6")                                    \
         do {                                                       \
             if (!(x & mask)) {                                     \
                 bits -= shift;                                     \
