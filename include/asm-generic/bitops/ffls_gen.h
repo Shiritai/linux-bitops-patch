@@ -11,11 +11,18 @@
  *          aimed to remove all magic numbers and bad smells of fls function series since
  *          original implementation in files: __fls.h, fls.h, fls64.h, bitops.h are
  *          almost the duplicates of each others.
- *          Current implementation is suitable for input type within 64 bits.
  */
 
 #define __FFLS_START_INDEX_FROM_ZERO 0
 #define __FFLS_START_INDEX_FROM_ONE 1
+
+/**
+ * Loop unrolling pragma for GCC to do optimization.
+ * 
+ * "6" is for at most 64 bits long data, for 128 bits,
+ *          please assign it as "GCC unroll 7"
+ */
+#define __FFLS_UNROLL_PRAGMA "GCC unroll 6"
 
 /**
  * Hidden generator of ffs to hide evaluation of size of type
@@ -27,12 +34,12 @@
         in_type mask;                                              \
         if (!x)                                                    \
             return 0;                                              \
-        bits = start_from;                                         \
         shift = bit_len >> 1;                                      \
+        bits = start_from;                                         \
         mask = (in_type) ~(0xFFFFFFFFFFFFFFFF << shift);           \
         /* unroll 6 times for 64 bits input */                     \
         /* no side effect if exceed possible unroll time */        \
-        _Pragma("GCC unroll 6")                                    \
+        _Pragma(__FFLS_UNROLL_PRAGMA)                                    \
         do {                                                       \
             if (!(x & mask)) {                                     \
                 bits += shift;                                     \
@@ -82,7 +89,7 @@
         mask = (in_type) (0xFFFFFFFFFFFFFFFF << shift);            \
         /* unroll 6 times for 64 bits input */                     \
         /* no side effect if exceed possible unroll time */        \
-        _Pragma("GCC unroll 6")                                    \
+        _Pragma(__FFLS_UNROLL_PRAGMA)                                    \
         do {                                                       \
             if (!(x & mask)) {                                     \
                 bits -= shift;                                     \
@@ -116,5 +123,48 @@
  */
 #define gen_fls(in_type, out_type, start_from, fn_name) \
     __gen_fls(in_type, out_type, start_from, fn_name, (sizeof(in_type) * 8))
+
+/**
+ * Macro generators below is just placed for future use.
+ * The implementation method is based on the relationship
+ *              of clz <-> fls, ctz/ffz <-> ffs.
+ */
+
+#define __gen_clz(in_type, out_type, fn_name, bit_len)  \
+    __gen_fls(in_type, out_type,                        \
+            __FFLS_START_INDEX_FROM_ONE,                \
+            __fls_##fn_name, bit_len);                  \
+    static __always_inline out_type fn_name(in_type x)  \
+    {                                                   \
+        return bit_len - __fls_##fn_name(x);            \
+    }
+
+/**
+ * Macro to generate "count leading zeros"
+ * for type which length is less than int_64_t
+ */
+#define gen_clz(in_type, out_type, fn_name) \
+    __gen_clz(in_type, out_type, fn_name, (sizeof(in_type) * 8))
+
+/**
+ * Macro to generate "count trailing zeros"
+ * for type which length is less than int_64_t
+ */
+#define gen_ctz(in_type, out_type, fn_name) \
+    __gen_ffs(in_type, out_type,            \
+        __FFLS_START_INDEX_FROM_ZERO,       \
+        fn_name, (sizeof(in_type) * 8))
+
+#define __gen_ffz(in_type, out_type, fn_name, bit_len)  \
+    __gen_ffs(in_type, out_type,                        \
+            __FFLS_START_INDEX_FROM_ZERO,               \
+            __ffs_##fn_name, bit_len);                  \
+    static __always_inline out_type fn_name(in_type x)  \
+    {                                                   \
+        return __ffs_##fn_name(~x);                     \
+    }
+
+#define gen_ffz(in_type, out_type, fn_name) \
+    __gen_ffz(in_type, out_type, fn_name, (sizeof(in_type) * 8))
 
 #endif /* _ASM_GENERIC_BITOPS_SOFTWARE_FFS_FLS_GEN_H_ */
