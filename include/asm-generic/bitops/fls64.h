@@ -3,7 +3,6 @@
 #define _ASM_GENERIC_BITOPS_FLS64_H_
 
 #include <asm/types.h>
-
 #include <asm-generic/bitops/ffls_gen.h>
 
 /**
